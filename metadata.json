@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "author": "Ross Golder",
   "license": "GPL",
-  "summary": "A module to set up an Apache2-hosted puppetmaster, and a webhook to update the puppet files from git."
+  "summary": "A module to set up an Apache2-hosted puppetmaster, and a webhook to update the puppet files from git.",
   "source": "https://github.com/rossigee/rossigee-puppetmaster",
   "project_page": "https://forge.puppetlabs.com/rossigee/puppetmaster",
   "issues_url": "https://github.com/rossigee/rossigee-puppetmaster/issues",
