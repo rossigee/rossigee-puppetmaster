@@ -1,0 +1,21 @@
+description "Web Hook for automating puppetmaster updates from git"
+
+start on filesystem or runlevel [2345]
+stop on run level [!2345]
+
+env APP_DIR=/var/lib/puppet
+env APP_EXEC=/usr/local/bin/puppetmaster-webhook
+env USER=puppet
+
+env BINDIP=<%= @config['webhook']['bindip'] %>
+env BINDPORT=<%= @config['webhook']['bindport'] %>
+env TOKEN=<%= @config['webhook']['token'] %>
+
+respawn
+respawn limit 20 5
+
+script
+  exec start-stop-daemon --start --chuid ${USER} --chdir ${APP_DIR} --exec ${APP_EXEC} \
+     -- ${BINDIP} ${BINDPORT} ${TOKEN}
+end script
+

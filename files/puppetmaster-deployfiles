@@ -1,0 +1,47 @@
+#!/bin/bash
+
+# Source config
+. /etc/puppetmaster.conf
+
+WD=/var/tmp
+
+# Get latest source from git repo
+echo "Fetching latest source..."
+[ ! -d $WD ] && mkdir $WD
+cd $WD
+if [ ! -d puppet ]; then
+    git clone $GITREPO
+    if [ $? -ne 0 ]; then
+        echo "Error cloning git repo."
+        exit 1
+    fi
+else
+    (cd puppet && git pull)
+    if [ $? -ne 0 ]; then
+        echo "Error pulling from git repo."
+        exit 1
+    fi
+fi
+
+# Deploy
+echo "Deploying puppet configuration..."
+rsync -av puppet/* /etc/puppet --delete
+if [ $? -ne 0 ]; then
+    echo "Error deploying puppet configuration."
+    exit 1
+fi
+
+# Install our third party puppet modules in place
+if [ "$MODULES" != "" ]; then
+    for module in $MODULES; do
+	echo "Installing $module..."
+        puppet module install $module
+        if [ $? -ne 0 ]; then
+            echo "Error deploying third party puppet modules."
+            exit 1
+        fi
+    done
+fi
+
+echo "Done."
+rm -rf puppet

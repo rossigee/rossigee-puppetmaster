@@ -1,0 +1,57 @@
+#!/usr/bin/env python
+#-*- coding:utf-8 -*-
+
+import BaseHTTPServer
+import sys
+import urlparse
+import json
+import logging
+import logging.handlers
+from urlparse import urlparse, parse_qs
+from subprocess import call
+
+logging.basicConfig()
+logger = logging.getLogger('webhookhandler')
+logger.addHandler(logging.handlers.SysLogHandler())
+logger.setLevel(logging.INFO)
+
+HOST_NAME = sys.argv[1]
+PORT_NUMBER = int(sys.argv[2])
+TOKEN = sys.argv[3]
+
+class HookHandler(BaseHTTPServer.BaseHTTPRequestHandler):
+    server_version = "PuppetMasterWebHookHandler/0.2"
+    def do_GET(s):
+        params = parse_qs(urlparse(s.path).query)
+        token = params['token'][0]
+        if token != TOKEN:
+            logger.info("Invalid token provided (%s - %s)." % (s.client_address[0], token))
+            s.send_response(401)
+            s.end_headers()
+            s.wfile.write("Up yours.")
+            return
+
+        logger.info("Triggering redeploy.")
+        exitcode = call(["sudo", "-H", "/usr/local/bin/puppetmaster-deployfiles"])
+        if exitcode != 0:
+            logger.info("Deployment failed, exitcode: %d" % exitcode)
+            s.send_response(500)
+            s.end_headers()
+            s.wfile.write("Deployment failed.")
+            return
+        
+        s.send_response(200)
+        s.end_headers()
+        s.wfile.write("We're done here.")
+
+if __name__ == '__main__':
+    server_class = BaseHTTPServer.HTTPServer
+    httpd = server_class((HOST_NAME, PORT_NUMBER), HookHandler)
+    logger.info("Webhook server starts - %s:%s" % (HOST_NAME, PORT_NUMBER))
+    try:
+        httpd.serve_forever()
+    except KeyboardInterrupt:
+        pass
+    httpd.server_close()
+    logger.info("Webhook service stops - %s:%s" % (HOST_NAME, PORT_NUMBER))
+

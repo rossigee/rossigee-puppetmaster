@@ -1,0 +1,7 @@
+export GITREPO=<%= @config['gitrepo'] %>
+export MODULES="
+<% for @module in @config['modules'] %>
+<%= @module -%>
+<% end %>
+"
+
