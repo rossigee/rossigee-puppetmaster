@@ -1,6 +1,6 @@
 {
   "name": "rossigee-puppetmaster",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "author": "Ross Golder",
   "license": "GPL",
   "summary": "A module to set up an Apache2-hosted puppetmaster, and a webhook to update the puppet files from git.",

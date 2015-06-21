@@ -1,7 +1,9 @@
 export GITREPO=<%= @config['gitrepo'] %>
+<% if @config.has_key?('modules') %>
 export MODULES="
 <% for @module in @config['modules'] %>
 <%= @module -%>
 <% end %>
 "
+<% end %>
 
