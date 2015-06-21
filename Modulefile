@@ -1,5 +1,5 @@
 name    'rossigee/puppetmaster'
-version '0.1.1'
+version '0.1.2'
 source 'https://github.com/rossigee/rossigee-puppetmaster'
 author 'Ross Golder'
 license 'GPL'

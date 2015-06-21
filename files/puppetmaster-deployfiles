@@ -43,5 +43,15 @@ if [ "$MODULES" != "" ]; then
     done
 fi
 
+# Apply librarian-puppet, if it's config exists
+if [ -f /etc/puppet/Puppetfile ]; then
+    cd /etc/puppet
+    librarian-puppet install --verbose
+    if [ $? -ne 0 ]; then
+        echo "Error running librarian-puppet."
+        exit 1
+    fi
+fi
+
 echo "Done."
 rm -rf puppet
