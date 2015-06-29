@@ -1,5 +1,5 @@
 class puppetmaster::deployfiles {
-    $_config = hiera('profile')
+    $_config = hiera_hash('profile')
     $config = $_config['puppetmaster']
     $netrc = $config['netrc']
     
