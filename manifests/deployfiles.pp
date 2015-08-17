@@ -43,44 +43,47 @@ class puppetmaster::deployfiles {
         content => template("puppetmaster/netrc.erb"),
     }
     
-    # The webhook needs to be running at all times
-    service { 'puppetmaster-webhook':
-        ensure => running,
-        provider => 'systemd',
-        require => Exec['refresh-puppetmaster-webhook-service'],
-    }
-
-    # Upstart configs...
-    if File.exists?('/sbin/initctl') {
-        file { "/etc/init/puppetmaster-webhook.conf":
-            mode   => 644,
-            owner  => root,
-            group  => root,
-            content => template("puppetmaster/puppetmaster-webhook.upstart.erb"),
-            notify => Service['puppetmaster-webhook'],
+    # Init scripts...
+    case $::initsystem {
+        'upstart': {
+            file { "/etc/init/puppetmaster-webhook.conf":
+                mode   => 644,
+                owner  => root,
+                group  => root,
+                content => template("puppetmaster/puppetmaster-webhook.upstart.erb"),
+                notify => Service['puppetmaster-webhook'],
+            }
+            exec { 'refresh-puppetmaster-webhook-init':
+                path => "/sbin:/usr/sbin:/bin:/usr/bin",
+                command => "initctl reload-configuration",
+                require => File['/etc/init/puppetmaster-webhook.conf'],
+                unless => "initctl list | grep puppetmaster-webhook",
+            }
+            service { 'puppetmaster-webhook':
+                ensure => running,
+                provider => 'upstart',
+                require => Exec['refresh-puppetmaster-webhook-service'],
+            }
         }
-        exec { 'refresh-puppetmaster-webhook-init':
-            path => "/sbin:/usr/sbin:/bin:/usr/bin",
-            command => "initctl reload-configuration",
-            require => File['/etc/init/puppetmaster-webhook.conf'],
-            unless => "initctl list | grep puppetmaster-webhook",
-        }
-    }
-
-    # Systemd configs...
-    if File.exists?('/bin/systemctl') {
-        file { "/etc/systemd/system/puppetmaster-webhook.service":
-            mode   => 644,
-            owner  => root,
-            group  => root,
-            content => template("puppetmaster/puppetmaster-webhook.service.erb"),
-            notify => Service['puppetmaster-webhook'],
-        }
-        exec { 'refresh-puppetmaster-webhook-service':
-            path => "/sbin:/usr/sbin:/bin:/usr/bin",
-            command => "systemctl daemon-reload && systemctl start puppetmaster-webhook",
-            require => File['/etc/init/puppetmaster-webhook.conf'],
-            onlyif => "systemctl status puppetmaster-webhook > /dev/null"
+        'systemd': {
+            file { "/etc/systemd/system/puppetmaster-webhook.service":
+                mode   => 644,
+                owner  => root,
+                group  => root,
+                content => template("puppetmaster/puppetmaster-webhook.service.erb"),
+                notify => Service['puppetmaster-webhook'],
+            }
+            exec { 'refresh-puppetmaster-webhook-service':
+                path => "/sbin:/usr/sbin:/bin:/usr/bin",
+                command => "systemctl daemon-reload && systemctl start puppetmaster-webhook",
+                require => File['/etc/systemd/system/puppetmaster-webhook.service'],
+                onlyif => "systemctl status puppetmaster-webhook > /dev/null"
+            }
+            service { 'puppetmaster-webhook':
+                ensure => running,
+                provider => 'systemd',
+                require => Exec['refresh-puppetmaster-webhook-service'],
+            }
         }
     }
 }
