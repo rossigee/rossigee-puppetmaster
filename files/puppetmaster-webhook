@@ -23,7 +23,12 @@ class HookHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     server_version = "PuppetMasterWebHookHandler/0.2"
     def do_GET(s):
         params = parse_qs(urlparse(s.path).query)
-        token = params['token'][0]
+        try:
+            token = params['token'][0]
+        except KeyError:
+            s.send_response(200)
+            s.end_headers()
+            s.wfile.write("All is well.")
         if token != TOKEN:
             logger.info("Invalid token provided (%s - %s)." % (s.client_address[0], token))
             s.send_response(401)
