@@ -16,7 +16,7 @@ Listen 8140
 
 <VirtualHost *:8140>
         SSLEngine on
-        SSLProtocol -ALL +SSLv3 +TLSv1
+        SSLProtocol -ALL +TLSv1.1 +TLSv1.2
         SSLCipherSuite ALL:!ADH:RC4+RSA:+HIGH:+MEDIUM:-LOW:-SSLv2:-EXP
 
         SSLCertificateFile      /var/lib/puppet/ssl/certs/<%= @clientcert %>.pem
