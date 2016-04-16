@@ -6,3 +6,5 @@ license 'GPL'
 summary 'An Apache2-hosted puppetmaster, and a webhook to update the puppet files from git.'
 description 'A module to set up an Apache2-hosted puppetmaster, and a webhook to update the puppet files from git.'
 project_page 'https://github.com/rossigee/rossigee-puppetmaster'
+
+dependency 'saz/sudo', '>= 1.2.0'
