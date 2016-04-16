@@ -1,4 +1,8 @@
 class puppetmaster::apache2 {
+    $_config = hiera_hash('profile')
+    $config = $_config['puppetmaster']
+    $puppetmaster_hostname = $config['hostname']
+
     $pkgs = [
         'apache2',
         'puppetmaster-passenger',

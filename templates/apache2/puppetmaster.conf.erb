@@ -19,8 +19,8 @@ Listen 8140
         SSLProtocol -ALL +TLSv1.1 +TLSv1.2
         SSLCipherSuite ALL:!ADH:RC4+RSA:+HIGH:+MEDIUM:-LOW:-SSLv2:-EXP
 
-        SSLCertificateFile      /var/lib/puppet/ssl/certs/<%= @clientcert %>.pem
-        SSLCertificateKeyFile   /var/lib/puppet/ssl/private_keys/<%= @clientcert %>.pem
+        SSLCertificateFile      /var/lib/puppet/ssl/certs/<%= @puppetmaster_hostname %>.pem
+        SSLCertificateKeyFile   /var/lib/puppet/ssl/private_keys/<%= @puppetmaster_hostname %>.pem
         SSLCertificateChainFile /var/lib/puppet/ssl/certs/ca.pem
         SSLCACertificateFile    /var/lib/puppet/ssl/certs/ca.pem
         # If Apache complains about invalid signatures on the CRL, you can try disabling

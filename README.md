@@ -5,6 +5,7 @@
 ```
 profile:
     puppetmaster:
+        hostname: puppet.yourdomain.com
         netrc:
             machine: (git server hostname)
             login: (git user login)
